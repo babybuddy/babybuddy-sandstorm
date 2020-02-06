@@ -1,0 +1,5 @@
+# Application files.
+/babybuddy
+
+# IDE files.
+.idea
