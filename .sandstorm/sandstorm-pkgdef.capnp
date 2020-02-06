@@ -19,11 +19,10 @@ const pkgdef :Spk.PackageDefinition = (
 
     metadata = (
       icons = (
-        appGrid = (png = (dpi1x = embed "../babybuddy/babybuddy/static_src/root/android-chrome-192x192.png")),
-        grain = (png = (dpi1x = embed "../babybuddy/babybuddy/static_src/root/favicon-16x16.png",
-                        dpi2x = embed "../babybuddy/babybuddy/static_src/root/favicon-32x32.png")),
-        market = (png = (dpi1x = embed "../babybuddy/babybuddy/static_src/root/android-chrome-192x192.png")),
-        marketBig = (png = (dpi1x = embed "../babybuddy/babybuddy/static_src/root/android-chrome-384x384.png"))
+         appGrid = (svg = embed "app-metadata/logo-128.svg"),
+         grain = (svg = embed "app-metadata/logo-24.svg"),
+         market = (svg = embed "app-metadata/logo-150.svg"),
+         marketBig = (svg = embed "app-metadata/logo-150.svg"),
       ),
       website = "http://baby-buddy.net",
       codeUrl = "https://github.com/babybuddy/babybuddy",
@@ -32,11 +31,11 @@ const pkgdef :Spk.PackageDefinition = (
       author = (
         contactEmail = "wells@chrxs.net",
       ),
-      description = (defaultText = embed "../babybuddy/README.md"),
-      shortDescription = (defaultText = "Caregiver helper"),
+      description = (defaultText = embed "app-metadata/description.md"),
+      shortDescription = (defaultText = "Caregiver support app"),
       screenshots = [
-        (width = 657, height = 932, png = embed "../babybuddy/screenshot.png"),
-        (width = 646, height = 938, png = embed "../babybuddy/screenshot_mobile.png"),
+        (width = 657, height = 932, png = embed "app-metadata/screenshot-desktop.png"),
+        (width = 646, height = 938, png = embed "app-metadata/screenshot-mobile.png"),
       ],
     ),
   ),
