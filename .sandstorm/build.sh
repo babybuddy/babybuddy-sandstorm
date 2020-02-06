@@ -1,18 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-cd /opt/app
-
-# Get application code.
+# Checkout desired version.
 VERSION=$(cat /opt/app/VERSION)
-if [ ! -d /opt/app/babybuddy ] ; then
-  git clone https://github.com/babybuddy/babybuddy.git
-else
-  cd /opt/app/babybuddy
-  git fetch origin
-fi
 cd /opt/app/babybuddy
 git checkout v"${VERSION}"
+
+# Copy in Sandstorm specific application overrides.
+cp -rf /opt/app/overrides/* /opt/app/babybuddy
 
 # Set up virtual environment.
 VENV=/opt/app/babybuddy/.venv
