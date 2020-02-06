@@ -17,6 +17,7 @@ class SandstormUserMiddleware:
     """
     user_id = 'HTTP_X_SANDSTORM_USER_ID'
     user_full_name = 'HTTP_X_SANDSTORM_USERNAME'
+    user_perms = 'HTTP_X_SANDSTORM_PERMISSIONS'
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -45,6 +46,8 @@ class SandstormUserMiddleware:
         # Authenticate (and create, if necessary) a new user.
         user = auth.authenticate(request, remote_user=username)
         if user:
+            user_changed = False
+
             # Set first and last name.
             if request.META.get(self.user_full_name):
                 name = unquote(request.META.get(self.user_full_name))
@@ -52,10 +55,18 @@ class SandstormUserMiddleware:
                 user.first_name = parts[0]
                 if len(parts) > 1:
                     user.last_name = ' '.join(parts[1:])
-                user.save()
-            # All Baby Buddy users are a "super user".
-            if not user.is_superuser:
+                user_changed = True
+
+            # Handle Sandstorm permissions
+            perms = request.META[self.user_perms].split(',')
+            if 'admin' in perms:
+                user.is_staff = True
+                user_changed = True
+            if 'edit' in perms:
                 user.is_superuser = True
+                user_changed = True
+
+            if user_changed:
                 user.save()
             request.user = user
             auth.login(request, user)
