@@ -233,6 +233,8 @@ opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/migrati
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/migrations/__pycache__/0002_logentry_remove_auto_add.cpython-37.pyc
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/migrations/__pycache__/0003_logentry_add_action_flag_choices.cpython-37.pyc
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/migrations/__pycache__/__init__.cpython-37.pyc
+opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/templates/admin/base.html
+opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/templates/admin/index.html
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/templatetags
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/templatetags/__init__.py
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/contrib/admin/templatetags/__pycache__
@@ -576,6 +578,7 @@ opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/__pycache__/wid
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/boundfield.py
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/renderers.py
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/templates/django/forms/widgets/attrs.html
+opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/templates/django/forms/widgets/checkbox.html
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/templates/django/forms/widgets/clearable_file_input.html
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/templates/django/forms/widgets/date.html
 opt/app/babybuddy/.venv/lib/python3.7/site-packages/django/forms/templates/django/forms/widgets/email.html
@@ -2513,6 +2516,7 @@ opt/app/babybuddy/babybuddy/settings
 opt/app/babybuddy/babybuddy/settings/__init__.py
 opt/app/babybuddy/babybuddy/settings/base.py
 opt/app/babybuddy/babybuddy/settings/sandstorm.py
+opt/app/babybuddy/babybuddy/templates/admin/base_site.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/base.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/filter.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/form.html
@@ -2521,6 +2525,9 @@ opt/app/babybuddy/babybuddy/templates/babybuddy/messages.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/nav-dropdown.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/page.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/paginator.html
+opt/app/babybuddy/babybuddy/templates/babybuddy/user_confirm_delete.html
+opt/app/babybuddy/babybuddy/templates/babybuddy/user_form.html
+opt/app/babybuddy/babybuddy/templates/babybuddy/user_list.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/user_settings_form.html
 opt/app/babybuddy/babybuddy/templates/babybuddy/welcome.html
 opt/app/babybuddy/babybuddy/templates/registration/base.html
@@ -2603,11 +2610,20 @@ opt/app/babybuddy/reports/views.py
 opt/app/babybuddy/static
 opt/app/babybuddy/static/admin
 opt/app/babybuddy/static/admin/css
+opt/app/babybuddy/static/admin/css/base.ae33e6383baa.css
+opt/app/babybuddy/static/admin/css/dashboard.7ac78187c567.css
+opt/app/babybuddy/static/admin/css/fonts.168bab448fee.css
+opt/app/babybuddy/static/admin/css/responsive.755ce0b07393.css
 opt/app/babybuddy/static/admin/css/vendor
 opt/app/babybuddy/static/admin/css/vendor/select2
 opt/app/babybuddy/static/admin/fonts
+opt/app/babybuddy/static/admin/fonts/Roboto-Bold-webfont.50d75e48e0a3.woff
+opt/app/babybuddy/static/admin/fonts/Roboto-Light-webfont.c73eb1ceba33.woff
+opt/app/babybuddy/static/admin/fonts/Roboto-Regular-webfont.35b07eb2f871.woff
 opt/app/babybuddy/static/admin/img
 opt/app/babybuddy/static/admin/img/gis
+opt/app/babybuddy/static/admin/img/icon-addlink.d519b3bab011.svg
+opt/app/babybuddy/static/admin/img/icon-changelink.18d2fd706348.svg
 opt/app/babybuddy/static/admin/js
 opt/app/babybuddy/static/admin/js/admin
 opt/app/babybuddy/static/admin/js/vendor
