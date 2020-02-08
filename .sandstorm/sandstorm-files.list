@@ -17,7 +17,6 @@ lib64
 opt/app/.sandstorm/launcher.sh
 opt/app/.sandstorm/service-config/mime.types
 opt/app/.sandstorm/service-config/nginx.conf
-opt/app/babybuddy
 proc/cpuinfo
 sandstorm-http-bridge
 sandstorm-http-bridge-config
