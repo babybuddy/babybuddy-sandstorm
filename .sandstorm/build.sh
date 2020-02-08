@@ -5,7 +5,6 @@ set -euo pipefail
 VERSION=$(grep -oE 'appMarketingVersion = \(defaultText = "(.+)"' /opt/app/.sandstorm/sandstorm-pkgdef.capnp | cut -d '"' -f2)
 cd /opt/app/babybuddy
 git add --all
-git rm -rq --cached .venv  # TODO: Remove after base .gitignore update.
 git checkout -f v"${VERSION}"
 git apply /opt/app/sandstorm.patch
 
