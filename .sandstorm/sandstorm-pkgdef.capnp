@@ -51,7 +51,7 @@ const pkgdef :Spk.PackageDefinition = (
     ]
   ),
   fileList = "sandstorm-files.list",
-  alwaysInclude = [ "opt/app/babybuddy/.venv", "usr/lib/python3",
+  alwaysInclude = [ "opt/app/babybuddy", "usr/lib/python3",
                     "usr/lib/python3.7" ],
   bridgeConfig = (
     viewInfo = (
