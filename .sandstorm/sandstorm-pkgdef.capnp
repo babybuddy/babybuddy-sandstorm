@@ -28,7 +28,9 @@ const pkgdef :Spk.PackageDefinition = (
       categories = [productivity, other],
       author = (
         contactEmail = "wells@chrxs.net",
+        pgpSignature = embed "pgp-signature",
       ),
+      pgpKeyring = embed "pgp-keyring",
       description = (defaultText = embed "app-metadata/description.md"),
       shortDescription = (defaultText = "Caregiver support app"),
       screenshots = [
