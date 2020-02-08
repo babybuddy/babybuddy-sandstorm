@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-# Checkout desired version.
+# Checkout desired version and apply Sandstorm patch.
 VERSION=$(grep -oE 'appMarketingVersion = \(defaultText = "(.+)"' /opt/app/.sandstorm/sandstorm-pkgdef.capnp | cut -d '"' -f2)
 cd /opt/app/babybuddy
-git checkout v"${VERSION}"
-
-# Copy in Sandstorm specific application overrides.
-cp -rf /opt/app/overrides/* /opt/app/babybuddy
+git add --all
+git rm -rq --cached .venv  # TODO: Remove after base .gitignore update.
+git checkout -f v"${VERSION}"
+git apply /opt/app/sandstorm.patch
 
 # Set up virtual environment.
 VENV=/opt/app/babybuddy/.venv

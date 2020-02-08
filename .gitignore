@@ -1,6 +1,5 @@
 # Application files.
 /babybuddy
-/.env
 
 # IDE files.
 /.idea

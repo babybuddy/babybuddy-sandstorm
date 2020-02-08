@@ -1,0 +1,313 @@
+diff --git a/babybuddy/forms.py b/babybuddy/forms.py
+index 004d738..e75f635 100644
+--- a/babybuddy/forms.py
++++ b/babybuddy/forms.py
+@@ -6,20 +6,6 @@ from django.contrib.auth.models import User
+ from .models import Settings
+ 
+ 
+-class UserAddForm(UserCreationForm):
+-    class Meta:
+-        model = User
+-        fields = ['username', 'first_name', 'last_name', 'email',
+-                  'is_staff', 'is_active']
+-
+-    def save(self, commit=True):
+-        user = super(UserAddForm, self).save(commit=False)
+-        user.is_superuser = True
+-        if commit:
+-            user.save()
+-        return user
+-
+-
+ class UserUpdateForm(forms.ModelForm):
+     class Meta:
+         model = User
+@@ -33,11 +19,6 @@ class UserForm(forms.ModelForm):
+         fields = ['first_name', 'last_name', 'email']
+ 
+ 
+-class UserPasswordForm(PasswordChangeForm):
+-    class Meta:
+-        fields = ['old_password', 'new_password1', 'new_password2']
+-
+-
+ class UserSettingsForm(forms.ModelForm):
+     class Meta:
+         model = Settings
+diff --git a/babybuddy/management/commands/migrate.py b/babybuddy/management/commands/migrate.py
+index 0e22ab5..d78c258 100644
+--- a/babybuddy/management/commands/migrate.py
++++ b/babybuddy/management/commands/migrate.py
+@@ -8,10 +8,3 @@ class Command(migrate.Command):
+ 
+     def handle(self, *args, **kwargs):
+         super(Command, self).handle(*args, **kwargs)
+-
+-        superusers = User.objects.filter(is_superuser=True)
+-        if len(superusers) == 0:
+-            default_user = User.objects.create_user('admin', password='admin')
+-            default_user.is_superuser = True
+-            default_user.is_staff = True
+-            default_user.save()
+diff --git a/babybuddy/middleware.py b/babybuddy/middleware.py
+new file mode 100644
+index 0000000..2f5dafa
+--- /dev/null
++++ b/babybuddy/middleware.py
+@@ -0,0 +1,88 @@
++from urllib.parse import unquote
++
++from django.contrib import auth
++from django.contrib.auth import load_backend
++from django.contrib.auth.backends import RemoteUserBackend
++from django.core.exceptions import ImproperlyConfigured
++
++
++class SandstormUserMiddleware:
++    """
++    Middleware for handling Sandstorm user properties.
++
++    This is mostly lifted from django.contrib.auth.middleware but the regular
++    `RemoteUserMiddleware` class is not extensible enough for Sandstorm.
++
++    See: https://docs.sandstorm.io/en/latest/developing/auth/
++    """
++    user_id = 'HTTP_X_SANDSTORM_USER_ID'
++    user_full_name = 'HTTP_X_SANDSTORM_USERNAME'
++    user_perms = 'HTTP_X_SANDSTORM_PERMISSIONS'
++
++    def __init__(self, get_response):
++        self.get_response = get_response
++
++    def __call__(self, request):
++        # AuthenticationMiddleware is required so that request.user exists.
++        if not hasattr(request, 'user'):
++            raise ImproperlyConfigured(
++                "The Django remote user auth middleware requires the"
++                " authentication middleware to be installed.  Edit your"
++                " MIDDLEWARE setting to insert"
++                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
++                " before the RemoteUserMiddleware class.")
++        try:
++            username = request.META[self.user_id]
++        except KeyError:
++            if request.user.is_authenticated:
++                self._remove_invalid_user(request)
++            return self.get_response(request)
++        if request.user.is_authenticated:
++            if request.user.get_username() == username:
++                return self.get_response(request)
++            else:
++                self._remove_invalid_user(request)
++
++        # Authenticate (and create, if necessary) a new user.
++        user = auth.authenticate(request, remote_user=username)
++        if user:
++            user_changed = False
++
++            # Set first and last name.
++            if request.META.get(self.user_full_name):
++                name = unquote(request.META.get(self.user_full_name))
++                parts = name.split(' ')
++                user.first_name = parts[0]
++                if len(parts) > 1:
++                    user.last_name = ' '.join(parts[1:])
++                user_changed = True
++
++            # Handle Sandstorm permissions
++            perms = request.META[self.user_perms].split(',')
++            if 'admin' in perms:
++                user.is_staff = True
++                user_changed = True
++            if 'edit' in perms:
++                user.is_superuser = True
++                user_changed = True
++
++            if user_changed:
++                user.save()
++            request.user = user
++            auth.login(request, user)
++
++        return self.get_response(request)
++
++    def _remove_invalid_user(self, request):
++        """
++        Remove the current authenticated user in the request which is invalid
++        but only if the user is authenticated via the RemoteUserBackend.
++        """
++        try:
++            stored_backend = load_backend(request.session.get(
++                auth.BACKEND_SESSION_KEY, ''))
++        except ImportError:
++            auth.logout(request)
++        else:
++            if isinstance(stored_backend, RemoteUserBackend):
++                auth.logout(request)
+diff --git a/babybuddy/settings/sandstorm.py b/babybuddy/settings/sandstorm.py
+new file mode 100644
+index 0000000..872e2cb
+--- /dev/null
++++ b/babybuddy/settings/sandstorm.py
+@@ -0,0 +1,27 @@
++from .base import *
++
++
++# Remote User authentication
++# https://docs.djangoproject.com/en/3.0/howto/auth-remote-user/
++
++MIDDLEWARE.append('babybuddy.middleware.SandstormUserMiddleware')
++AUTHENTICATION_BACKENDS = [
++    'django.contrib.auth.backends.RemoteUserBackend',
++]
++
++
++# Database
++# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
++
++DATABASES = {
++    'default': {
++        'ENGINE': 'django.db.backends.sqlite3',
++        'NAME': '/var/sqlite3/db.sqlite3',
++    }
++}
++
++
++# Media files (User uploaded content)
++# https://docs.djangoproject.com/en/3.0/topics/files/
++
++MEDIA_ROOT = '/var/media'
+diff --git a/babybuddy/templates/babybuddy/nav-dropdown.html b/babybuddy/templates/babybuddy/nav-dropdown.html
+index 6d75c7c..9f92a04 100644
+--- a/babybuddy/templates/babybuddy/nav-dropdown.html
++++ b/babybuddy/templates/babybuddy/nav-dropdown.html
+@@ -237,18 +237,10 @@
+                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-user-menu-link">
+                             <h6 class="dropdown-header">{% trans "User" %}</h6>
+                             <a href="{% url 'babybuddy:user-settings' %}" class="dropdown-item">{% trans "Settings" %}</a>
+-                            <a href="{% url 'babybuddy:user-password' %}" class="dropdown-item">{% trans "Password" %}</a>
+-                            <a href="{% url 'babybuddy:logout' %}" class="dropdown-item">{% trans "Logout" %}</a>
+                             <h6 class="dropdown-header">{% trans "Site" %}</h6>
+                             <a href="{% url 'api:api-root' %}"
+                                class="dropdown-item"
+                                target="_blank">{% trans "API Browser" %}</a>
+-                            {% if request.user.is_staff %}
+-                                <a href="{% url 'babybuddy:user-list' %}" class="dropdown-item">{% trans "Users" %}</a>
+-                                <a href="{% url 'admin:index' %}"
+-                                   class="dropdown-item"
+-                                   target="_blank">{% trans "Backend Admin" %}</a>
+-                            {% endif %}
+                             <h6 class="dropdown-header">{% trans "Support" %}</h6>
+                             <a href="https://github.com/babybuddy/babybuddy"
+                                class="dropdown-item"
+diff --git a/babybuddy/urls.py b/babybuddy/urls.py
+index a18f2a1..72bf8bf 100644
+--- a/babybuddy/urls.py
++++ b/babybuddy/urls.py
+@@ -9,34 +9,17 @@ from . import views
+ 
+ app_patterns = [
+     path('login/', auth_views.LoginView.as_view(), name='login'),
+-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+-    path(
+-        'password_reset/',
+-        auth_views.PasswordResetView.as_view(),
+-        name='password_reset'
+-    ),
+ 
+     path('', views.RootRouter.as_view(), name='root-router'),
+     path('welcome/', views.Welcome.as_view(), name='welcome'),
+ 
+     path('users/', views.UserList.as_view(), name='user-list'),
+-    path('users/add/', views.UserAdd.as_view(), name='user-add'),
+     path(
+         'users/<int:pk>/edit/',
+         views.UserUpdate.as_view(),
+         name='user-update'
+     ),
+-    path(
+-        'users/<int:pk>/delete/',
+-        views.UserDelete.as_view(),
+-        name='user-delete'
+-    ),
+ 
+-    path(
+-        'user/password/',
+-        views.UserPassword.as_view(),
+-        name='user-password'
+-    ),
+     path(
+         'user/reset-api-key/',
+         views.UserResetAPIKey.as_view(),
+@@ -50,7 +33,6 @@ app_patterns = [
+ ]
+ 
+ urlpatterns = [
+-    path('admin/', admin.site.urls),
+     path('', include('api.urls', namespace='api')),
+     path('', include((app_patterns, 'babybuddy'), namespace='babybuddy')),
+     path('user/lang', include('django.conf.urls.i18n')),
+diff --git a/babybuddy/views.py b/babybuddy/views.py
+index 66209cc..6b0dfe4 100644
+--- a/babybuddy/views.py
++++ b/babybuddy/views.py
+@@ -46,16 +46,6 @@ class UserList(StaffOnlyMixin, BabyBuddyFilterView):
+     filterset_fields = ('username', 'first_name', 'last_name', 'email')
+ 
+ 
+-class UserAdd(StaffOnlyMixin, PermissionRequired403Mixin, SuccessMessageMixin,
+-              CreateView):
+-    model = User
+-    template_name = 'babybuddy/user_form.html'
+-    permission_required = ('admin.add_user',)
+-    form_class = forms.UserAddForm
+-    success_url = reverse_lazy('babybuddy:user-list')
+-    success_message = gettext_lazy('User %(username)s added!')
+-
+-
+ class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
+                  SuccessMessageMixin, UpdateView):
+     model = User
+@@ -66,42 +56,6 @@ class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
+     success_message = gettext_lazy('User %(username)s updated.')
+ 
+ 
+-class UserDelete(StaffOnlyMixin, PermissionRequired403Mixin,
+-                 DeleteView):
+-    model = User
+-    template_name = 'babybuddy/user_confirm_delete.html'
+-    permission_required = ('admin.delete_user',)
+-    success_url = reverse_lazy('babybuddy:user-list')
+-
+-    def delete(self, request, *args, **kwargs):
+-        success_message = format_lazy(gettext_lazy(
+-            'User {user} deleted.'), user=self.get_object()
+-        )
+-        messages.success(request, success_message)
+-        return super(UserDelete, self).delete(request, *args, **kwargs)
+-
+-
+-class UserPassword(LoginRequiredMixin, View):
+-    """
+-    Handles user password changes.
+-    """
+-    form_class = forms.UserPasswordForm
+-    template_name = 'babybuddy/user_password_form.html'
+-
+-    def get(self, request):
+-        return render(request, self.template_name, {
+-            'form': self.form_class(request.user)
+-        })
+-
+-    def post(self, request):
+-        form = PasswordChangeForm(request.user, request.POST)
+-        if form.is_valid():
+-            user = form.save()
+-            update_session_auth_hash(request, user)
+-            messages.success(request, _('Password updated.'))
+-        return render(request, self.template_name, {'form': form})
+-
+-
+ class UserResetAPIKey(LoginRequiredMixin, View):
+     """
+     Resets the API key of the logged in user.
