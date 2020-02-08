@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Checkout desired version.
-VERSION=$(cat /opt/app/VERSION)
+VERSION=$(grep -oE 'appMarketingVersion = \(defaultText = "(.+)"' /opt/app/.sandstorm/sandstorm-pkgdef.capnp | cut -d '"' -f2)
 cd /opt/app/babybuddy
 git checkout v"${VERSION}"
 
