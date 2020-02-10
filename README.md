@@ -68,3 +68,27 @@ increment the "appVersion" directive by one.
 1. When ready, stop the development app (Ctrl-C) and pack the new APK.
 
         vagrant-spk pack ~/babybuddy.spk
+        
+### Updating [`sandstorm.patch`](sandstorm.patch)
+
+If Sandstorm specific changes need to updated or the patch no longer applies, a
+new patch will need to created:
+
+1. Follow the steps in the Development documentation above up to the
+`vagrant-spk dev` command.
+
+1. Stop the development app (Ctrl-C).
+
+1. Make any necessary changes to Baby Buddy in the `babybuddy` folder.
+
+1. When finished, cd in to the `babdybuddy` folder.
+
+        cd babybuddy
+        
+1. Add all files to git.
+
+        git add --all
+        
+1. Create a diff of the changes and save it to [`sandstorm.patch`](sandstorm.patch)
+
+        git diff HEAD > ../sandstorm.patch
