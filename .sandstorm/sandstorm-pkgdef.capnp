@@ -10,7 +10,7 @@ const pkgdef :Spk.PackageDefinition = (
     appVersion = 0,  # Increment this for every release.
     appMarketingVersion = (defaultText = "1.3.4"),
     actions = [
-      ( nounPhrase = (defaultText = "showcase"),
+      ( nounPhrase = (defaultText = "instance"),
         command = .firstRunCommand
       )
     ],
@@ -23,7 +23,7 @@ const pkgdef :Spk.PackageDefinition = (
          marketBig = (svg = embed "app-metadata/logo-150.svg"),
       ),
       website = "http://baby-buddy.net",
-      codeUrl = "https://github.com/babybuddy/babybuddy",
+      codeUrl = "https://github.com/babybuddy/babybuddy-sandstorm",
       license = (openSource = bsd2Clause),
       categories = [productivity, other],
       author = (
