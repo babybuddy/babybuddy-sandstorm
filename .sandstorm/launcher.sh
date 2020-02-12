@@ -10,6 +10,16 @@ mkdir -p /var/tmp
 # Set up database.
 mkdir -p /var/sqlite3
 cd /opt/app/babybuddy
+
+# Establish environment.
+mkdir -p /var/env
+if [ ! -f /var/env/secret ]; then
+  python3 -c 'import random; result = "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)]); print(result);' > /var/env/secret
+fi
+export DJANGO_SETTINGS_MODULE="babybuddy.settings.sandstorm"
+export SECRET_KEY="$(cat /var/env/secret)"
+
+# Set up database.
 pipenv run python manage.py migrate
 pipenv run python manage.py createcachetable
 

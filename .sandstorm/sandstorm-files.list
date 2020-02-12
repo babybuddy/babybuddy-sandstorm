@@ -23,6 +23,7 @@ sandstorm-http-bridge-config
 sandstorm-manifest
 usr/bin
 usr/bin/bash
+usr/bin/cat
 usr/bin/dash
 usr/bin/lzma
 usr/bin/mkdir
