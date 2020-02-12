@@ -52,98 +52,59 @@ index 0e22ab5..d78c258 100644
 -            default_user.save()
 diff --git a/babybuddy/middleware.py b/babybuddy/middleware.py
 new file mode 100644
-index 0000000..2f5dafa
+index 0000000..e844785
 --- /dev/null
 +++ b/babybuddy/middleware.py
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,49 @@
 +from urllib.parse import unquote
 +
-+from django.contrib import auth
-+from django.contrib.auth import load_backend
-+from django.contrib.auth.backends import RemoteUserBackend
-+from django.core.exceptions import ImproperlyConfigured
++from django.contrib.auth.middleware import RemoteUserMiddleware
 +
 +
-+class SandstormUserMiddleware:
++class SandstormUserMiddleware(RemoteUserMiddleware):
 +    """
 +    Middleware for handling Sandstorm user properties.
 +
-+    This is mostly lifted from django.contrib.auth.middleware but the regular
-+    `RemoteUserMiddleware` class is not extensible enough for Sandstorm.
-+
 +    See: https://docs.sandstorm.io/en/latest/developing/auth/
 +    """
-+    user_id = 'HTTP_X_SANDSTORM_USER_ID'
++    header = "HTTP_X_SANDSTORM_USER_ID"
 +    user_full_name = 'HTTP_X_SANDSTORM_USERNAME'
 +    user_perms = 'HTTP_X_SANDSTORM_PERMISSIONS'
 +
-+    def __init__(self, get_response):
-+        self.get_response = get_response
++    def process_request(self, request):
++        super().process_request(request)
++        if hasattr(request, 'user') and request.user.is_authenticated:
++            user_original = request.user
++            self.update_user_metadata(request)
++            self.update_user_permissions(request)
++            if request.user != user_original:
++                request.user.save()
 +
-+    def __call__(self, request):
-+        # AuthenticationMiddleware is required so that request.user exists.
-+        if not hasattr(request, 'user'):
-+            raise ImproperlyConfigured(
-+                "The Django remote user auth middleware requires the"
-+                " authentication middleware to be installed.  Edit your"
-+                " MIDDLEWARE setting to insert"
-+                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
-+                " before the RemoteUserMiddleware class.")
-+        try:
-+            username = request.META[self.user_id]
-+        except KeyError:
-+            if request.user.is_authenticated:
-+                self._remove_invalid_user(request)
-+            return self.get_response(request)
-+        if request.user.is_authenticated:
-+            if request.user.get_username() == username:
-+                return self.get_response(request)
-+            else:
-+                self._remove_invalid_user(request)
++    def update_user_metadata(self, request):
++        """
++        Update metadata about the user based on Sandstorm headers.
++        """
++        # Set first and last name.
++        if self.user_full_name in request.META:
++            name = unquote(request.META.get(self.user_full_name))
++            name_parts = name.split(' ')
++            if hasattr(request.user, 'first_name'):
++                request.user.first_name = name_parts[0]
++            if hasattr(request.user, 'last_name') and len(name_parts) > 1:
++                request.user.last_name = ' '.join(name_parts[1:])
 +
-+        # Authenticate (and create, if necessary) a new user.
-+        user = auth.authenticate(request, remote_user=username)
-+        if user:
-+            user_changed = False
++    def update_user_permissions(self, request):
++        """
++        Update user permissions based on Sandstorm headers.
 +
-+            # Set first and last name.
-+            if request.META.get(self.user_full_name):
-+                name = unquote(request.META.get(self.user_full_name))
-+                parts = name.split(' ')
-+                user.first_name = parts[0]
-+                if len(parts) > 1:
-+                    user.last_name = ' '.join(parts[1:])
-+                user_changed = True
-+
-+            # Handle Sandstorm permissions
-+            perms = request.META[self.user_perms].split(',')
++        This method assumes a default "admin" permission that is granted staff
++        and superuser status in Django.
++        """
++        if self.user_perms in request.META:
++            perms = request.META.get(self.user_perms).split(',')
 +            if 'admin' in perms:
-+                user.is_staff = True
-+                user_changed = True
-+            if 'edit' in perms:
-+                user.is_superuser = True
-+                user_changed = True
-+
-+            if user_changed:
-+                user.save()
-+            request.user = user
-+            auth.login(request, user)
-+
-+        return self.get_response(request)
-+
-+    def _remove_invalid_user(self, request):
-+        """
-+        Remove the current authenticated user in the request which is invalid
-+        but only if the user is authenticated via the RemoteUserBackend.
-+        """
-+        try:
-+            stored_backend = load_backend(request.session.get(
-+                auth.BACKEND_SESSION_KEY, ''))
-+        except ImportError:
-+            auth.logout(request)
-+        else:
-+            if isinstance(stored_backend, RemoteUserBackend):
-+                auth.logout(request)
++                request.user.is_staff = True
++                request.user.is_superuser = True
 diff --git a/babybuddy/settings/sandstorm.py b/babybuddy/settings/sandstorm.py
 new file mode 100644
 index 0000000..872e2cb
