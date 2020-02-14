@@ -1,3 +1,15 @@
+diff --git a/Pipfile b/Pipfile
+index 0bf2d3f..d7381f8 100644
+--- a/Pipfile
++++ b/Pipfile
+@@ -21,6 +21,7 @@ easy-thumbnails = "*"
+ python-dotenv = "*"
+ django-storages = "*"
+ boto3 = "*"
++django-sandstorm = {editable = true,git = "https://github.com/cdubz/django-sandstorm.git"}
+ 
+ 
+ [dev-packages]
 diff --git a/babybuddy/forms.py b/babybuddy/forms.py
 index 004d738..e75f635 100644
 --- a/babybuddy/forms.py
@@ -50,74 +62,30 @@ index 0e22ab5..d78c258 100644
 -            default_user.is_superuser = True
 -            default_user.is_staff = True
 -            default_user.save()
-diff --git a/babybuddy/middleware.py b/babybuddy/middleware.py
-new file mode 100644
-index 0000000..e844785
---- /dev/null
-+++ b/babybuddy/middleware.py
-@@ -0,0 +1,49 @@
-+from urllib.parse import unquote
-+
-+from django.contrib.auth.middleware import RemoteUserMiddleware
-+
-+
-+class SandstormUserMiddleware(RemoteUserMiddleware):
-+    """
-+    Middleware for handling Sandstorm user properties.
-+
-+    See: https://docs.sandstorm.io/en/latest/developing/auth/
-+    """
-+    header = "HTTP_X_SANDSTORM_USER_ID"
-+    user_full_name = 'HTTP_X_SANDSTORM_USERNAME'
-+    user_perms = 'HTTP_X_SANDSTORM_PERMISSIONS'
-+
-+    def process_request(self, request):
-+        super().process_request(request)
-+        if hasattr(request, 'user') and request.user.is_authenticated:
-+            user_original = request.user
-+            self.update_user_metadata(request)
-+            self.update_user_permissions(request)
-+            if request.user != user_original:
-+                request.user.save()
-+
-+    def update_user_metadata(self, request):
-+        """
-+        Update metadata about the user based on Sandstorm headers.
-+        """
-+        # Set first and last name.
-+        if self.user_full_name in request.META:
-+            name = unquote(request.META.get(self.user_full_name))
-+            name_parts = name.split(' ')
-+            if hasattr(request.user, 'first_name'):
-+                request.user.first_name = name_parts[0]
-+            if hasattr(request.user, 'last_name') and len(name_parts) > 1:
-+                request.user.last_name = ' '.join(name_parts[1:])
-+
-+    def update_user_permissions(self, request):
-+        """
-+        Update user permissions based on Sandstorm headers.
-+
-+        This method assumes a default "admin" permission that is granted staff
-+        and superuser status in Django.
-+        """
-+        if self.user_perms in request.META:
-+            perms = request.META.get(self.user_perms).split(',')
-+            if 'admin' in perms:
-+                request.user.is_staff = True
-+                request.user.is_superuser = True
 diff --git a/babybuddy/settings/sandstorm.py b/babybuddy/settings/sandstorm.py
 new file mode 100644
-index 0000000..872e2cb
+index 0000000..7aa8682
 --- /dev/null
 +++ b/babybuddy/settings/sandstorm.py
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,38 @@
 +from .base import *
 +
 +
-+# Remote User authentication
-+# https://docs.djangoproject.com/en/3.0/howto/auth-remote-user/
++# Django Sandstorm package configuration.
 +
-+MIDDLEWARE.append('babybuddy.middleware.SandstormUserMiddleware')
++INSTALLED_APPS.append('django_sandstorm')
++
++MIDDLEWARE.append('django_sandstorm.middleware.SandstormUserMiddleware')
++
++try:
++    csrf_index = MIDDLEWARE.index('django.middleware.csrf.CsrfViewMiddleware')
++    MIDDLEWARE.insert(
++        (csrf_index - 1),
++        'django_sandstorm.middleware.SandstormPreCsrfViewMiddleware'
++    )
++except ValueError:
++    pass
++
 +AUTHENTICATION_BACKENDS = [
 +    'django.contrib.auth.backends.RemoteUserBackend',
 +]
@@ -139,10 +107,10 @@ index 0000000..872e2cb
 +
 +MEDIA_ROOT = '/var/media'
 diff --git a/babybuddy/templates/babybuddy/nav-dropdown.html b/babybuddy/templates/babybuddy/nav-dropdown.html
-index 6d75c7c..9f92a04 100644
+index 6d75c7c..812c429 100644
 --- a/babybuddy/templates/babybuddy/nav-dropdown.html
 +++ b/babybuddy/templates/babybuddy/nav-dropdown.html
-@@ -237,18 +237,10 @@
+@@ -237,14 +237,11 @@
                          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-user-menu-link">
                              <h6 class="dropdown-header">{% trans "User" %}</h6>
                              <a href="{% url 'babybuddy:user-settings' %}" class="dropdown-item">{% trans "Settings" %}</a>
@@ -152,17 +120,13 @@ index 6d75c7c..9f92a04 100644
                              <a href="{% url 'api:api-root' %}"
                                 class="dropdown-item"
                                 target="_blank">{% trans "API Browser" %}</a>
--                            {% if request.user.is_staff %}
+                             {% if request.user.is_staff %}
 -                                <a href="{% url 'babybuddy:user-list' %}" class="dropdown-item">{% trans "Users" %}</a>
--                                <a href="{% url 'admin:index' %}"
--                                   class="dropdown-item"
--                                   target="_blank">{% trans "Backend Admin" %}</a>
--                            {% endif %}
-                             <h6 class="dropdown-header">{% trans "Support" %}</h6>
-                             <a href="https://github.com/babybuddy/babybuddy"
-                                class="dropdown-item"
+                                 <a href="{% url 'admin:index' %}"
+                                    class="dropdown-item"
+                                    target="_blank">{% trans "Backend Admin" %}</a>
 diff --git a/babybuddy/urls.py b/babybuddy/urls.py
-index a18f2a1..72bf8bf 100644
+index a18f2a1..8fad3ae 100644
 --- a/babybuddy/urls.py
 +++ b/babybuddy/urls.py
 @@ -9,34 +9,17 @@ from . import views
@@ -200,14 +164,6 @@ index a18f2a1..72bf8bf 100644
      path(
          'user/reset-api-key/',
          views.UserResetAPIKey.as_view(),
-@@ -50,7 +33,6 @@ app_patterns = [
- ]
- 
- urlpatterns = [
--    path('admin/', admin.site.urls),
-     path('', include('api.urls', namespace='api')),
-     path('', include((app_patterns, 'babybuddy'), namespace='babybuddy')),
-     path('user/lang', include('django.conf.urls.i18n')),
 diff --git a/babybuddy/views.py b/babybuddy/views.py
 index 66209cc..6b0dfe4 100644
 --- a/babybuddy/views.py

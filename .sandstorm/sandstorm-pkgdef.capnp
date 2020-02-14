@@ -7,7 +7,7 @@ const pkgdef :Spk.PackageDefinition = (
 
   manifest = (
     appTitle = (defaultText = "Baby Buddy"),
-    appVersion = 0,  # Increment this for every release.
+    appVersion = 1,  # Increment this for every release.
     appMarketingVersion = (defaultText = "1.3.4"),
     actions = [
       ( nounPhrase = (defaultText = "instance"),
@@ -57,14 +57,14 @@ const pkgdef :Spk.PackageDefinition = (
     viewInfo = (
       permissions = [
         (
-          name = "admin",
-          title = (defaultText = "admin"),
+          name = "staff",
+          title = (defaultText = "staff"),
           description = (defaultText = "grants ability to administer application"),
         ),
         (
-          name = "edit",
-          title = (defaultText = "edit"),
-          description = (defaultText = "grants ability to modify child data"),
+          name = "superuser",
+          title = (defaultText = "superuser"),
+          description = (defaultText = "grants ability to modify all data"),
         ),
       ],
       roles = [
