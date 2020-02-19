@@ -53,6 +53,10 @@ and set the "appMarketingVersion" directive to a new version of Baby Buddy and
 increment the "appVersion" directive by one.
 
         editor .sandstorm/sandstorm-pkgdef.capnp
+        
+1. Start the VM via Vagrant SPK.
+
+        vagrant-spk vm up
     
 1. Run the Vagrant SPK dev instance.
 
@@ -79,16 +83,28 @@ new patch will need to created:
 
 1. Stop the development app (Ctrl-C).
 
-1. Make any necessary changes to Baby Buddy in the `babybuddy` folder.
-
-1. When finished, cd in to the `babdybuddy` folder.
+1. Move in to the `babdybuddy` folder.
 
         cd babybuddy
+
+1. Apply the patch using 3way merge so conflicts will be created.
+
+        git apply --3way ../sandstorm.patch
+
+1. Resolve any conflicts and make additional changes as needed.
         
 1. Add all files to git.
 
         git add --all
         
-1. Create a diff of the changes and save it to [`sandstorm.patch`](sandstorm.patch)
+1. Create a diff of the changes and save it to [`sandstorm.patch`](sandstorm.patch).
 
         git diff HEAD > ../sandstorm.patch
+        
+1. Return to the main repository folder and start the vagrant dev instance.
+
+        cd ..
+        vagrant-spk dev
+        
+If the patch update was successful, the new patch should apply cleanly during
+the build phase.
