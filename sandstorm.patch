@@ -1,17 +1,17 @@
 diff --git a/Pipfile b/Pipfile
-index 0bf2d3f..d7381f8 100644
+index 62a51bb..4a20390 100644
 --- a/Pipfile
 +++ b/Pipfile
-@@ -21,6 +21,7 @@ easy-thumbnails = "*"
- python-dotenv = "*"
+@@ -19,6 +19,7 @@ python-dotenv = "*"
  django-storages = "*"
  boto3 = "*"
+ django-import-export = "*"
 +django-sandstorm = {editable = true,git = "https://github.com/cdubz/django-sandstorm.git"}
  
- 
  [dev-packages]
+ coveralls = "*"
 diff --git a/babybuddy/forms.py b/babybuddy/forms.py
-index 004d738..e75f635 100644
+index 4f0a7fb..c386b61 100644
 --- a/babybuddy/forms.py
 +++ b/babybuddy/forms.py
 @@ -6,20 +6,6 @@ from django.contrib.auth.models import User
@@ -107,10 +107,10 @@ index 0000000..7aa8682
 +
 +MEDIA_ROOT = '/var/media'
 diff --git a/babybuddy/templates/babybuddy/nav-dropdown.html b/babybuddy/templates/babybuddy/nav-dropdown.html
-index 6d75c7c..812c429 100644
+index 14f02aa..034fd30 100644
 --- a/babybuddy/templates/babybuddy/nav-dropdown.html
 +++ b/babybuddy/templates/babybuddy/nav-dropdown.html
-@@ -237,14 +237,11 @@
+@@ -239,14 +239,11 @@
                          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-user-menu-link">
                              <h6 class="dropdown-header">{% trans "User" %}</h6>
                              <a href="{% url 'babybuddy:user-settings' %}" class="dropdown-item">{% trans "Settings" %}</a>
@@ -122,9 +122,9 @@ index 6d75c7c..812c429 100644
                                 target="_blank">{% trans "API Browser" %}</a>
                              {% if request.user.is_staff %}
 -                                <a href="{% url 'babybuddy:user-list' %}" class="dropdown-item">{% trans "Users" %}</a>
-                                 <a href="{% url 'admin:index' %}"
-                                    class="dropdown-item"
-                                    target="_blank">{% trans "Backend Admin" %}</a>
+                                 <a href="{% url 'admin:index' %}" class="dropdown-item">{% trans "Database Admin" %}</a>
+                             {% endif %}
+                             <h6 class="dropdown-header">{% trans "Support" %}</h6>
 diff --git a/babybuddy/urls.py b/babybuddy/urls.py
 index a18f2a1..8fad3ae 100644
 --- a/babybuddy/urls.py
@@ -165,10 +165,10 @@ index a18f2a1..8fad3ae 100644
          'user/reset-api-key/',
          views.UserResetAPIKey.as_view(),
 diff --git a/babybuddy/views.py b/babybuddy/views.py
-index 66209cc..6b0dfe4 100644
+index 75f36b9..31eaab9 100644
 --- a/babybuddy/views.py
 +++ b/babybuddy/views.py
-@@ -46,16 +46,6 @@ class UserList(StaffOnlyMixin, BabyBuddyFilterView):
+@@ -47,16 +47,6 @@ class UserList(StaffOnlyMixin, BabyBuddyFilterView):
      filterset_fields = ('username', 'first_name', 'last_name', 'email')
  
  
@@ -185,7 +185,7 @@ index 66209cc..6b0dfe4 100644
  class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
                   SuccessMessageMixin, UpdateView):
      model = User
-@@ -66,42 +56,6 @@ class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
+@@ -67,42 +57,6 @@ class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
      success_message = gettext_lazy('User %(username)s updated.')
  
  

@@ -3,14 +3,21 @@
 This is the source for the [Baby Buddy](https://github.com/babybuddy/babybuddy)
 app for [Sandstorm](https://sandstorm.io/).
 
+## App Version History
+
+- v2: [Baby Buddy 1.4.0](https://github.com/babybuddy/babybuddy/releases/tag/v1.4.0)
+- v1: [Baby Buddy 1.3.4](https://github.com/babybuddy/babybuddy/releases/tag/v1.3.4)
+- v0: [Baby Buddy 1.3.0](https://github.com/babybuddy/babybuddy/releases/tag/v1.3.0)
+
 ## Caveats
 
-- Baby Buddy currently only supports setting the application time zone from an
-environment variable. This cannot be achieved with the regular Sandstorm grain
-workflow, so the timezone is locked to Etc/UTC.
+- ~~Baby Buddy currently only supports setting the application time zone from
+an environment variable. This cannot be achieved with the regular Sandstorm
+grain workflow, so the timezone is locked to Etc/UTC.~~ (Resolved as of v2)
 
-- Sandstorm user ID's are used for the username in Baby Buddy. This name is
-used for display throughout the app and is not terribly useful.
+- ~~Sandstorm user ID's are used for the username in Baby Buddy. This name is
+used for display throughout the app and is not terribly useful.~~ (Resolved as
+of v2)
 
 - Baby Buddy's API has not been fully implemented with Sandbox's API
 integration.
