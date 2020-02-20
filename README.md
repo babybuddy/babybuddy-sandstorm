@@ -76,7 +76,7 @@ increment the "appVersion" directive by one.
 
         browse http://local.sandstorm.io:6080
         
-1. When ready, stop the development app (Ctrl-C) and pack the new APK.
+1. When ready, stop the development app (Ctrl-C) and pack the new SPK.
 
         vagrant-spk pack ~/babybuddy.spk
         
@@ -90,7 +90,7 @@ new patch will need to created:
 
 1. Stop the development app (Ctrl-C).
 
-1. Move in to the `babdybuddy` folder.
+1. Move in to the `babybuddy` folder.
 
         cd babybuddy
 
