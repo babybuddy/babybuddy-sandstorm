@@ -16,4 +16,4 @@ git apply /opt/app/sandstorm.patch
 # Set up virtual environment.
 cd /opt/app/babybuddy
 export PIPENV_VENV_IN_PROJECT=1
-pipenv --three --bare install
+pipenv --bare install

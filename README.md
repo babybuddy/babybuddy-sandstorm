@@ -72,7 +72,7 @@ increment the "appVersion" directive by one.
     *Note: Confirm that [`sandstorm.patch`](sandstorm.patch) still applies
     during this command execution and update the patch if necessary.*
     
-1. Test new/modified functionality in the Sandstorm dev environment.
+1. Test new/modified functionality in the [Sandstorm dev environment](http://local.sandstorm.io:6080).
 
         browse http://local.sandstorm.io:6080
         
