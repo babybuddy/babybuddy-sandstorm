@@ -11,8 +11,8 @@ apt-get install -y nginx uwsgi uwsgi-plugin-python3 python3-pip python3-venv sql
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 source ~/.profile
-if ! [ -x "$(command -v git)" ]; then
-    pipx install --ignore-installed pipenv
+if ! [ -x "$(command -v pipenv)" ]; then
+    pipx install pipenv
 fi
 
 # Disable nginx (controlled by `launcher.sh`).
