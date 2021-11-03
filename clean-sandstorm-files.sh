@@ -7,7 +7,7 @@
 # Paths with the following directories are removed from the file:
 #  - opt/app/babybuddy
 #  - usr/lib/python3
-#  - usr/lib/python3.7
+#  - usr/lib/python3*
 #
 # This script should be run from the repo root.
 

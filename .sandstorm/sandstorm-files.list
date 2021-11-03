@@ -38,7 +38,6 @@ usr/bin/uwsgi
 usr/bin/uwsgi-core
 usr/bin/which
 usr/lib/locale/C.UTF-8/LC_CTYPE
-usr/lib/locale/locale-archive
 usr/lib/ssl/openssl.cnf
 usr/lib/uwsgi/plugins/python39_plugin.so
 usr/lib/uwsgi/plugins/python3_plugin.so

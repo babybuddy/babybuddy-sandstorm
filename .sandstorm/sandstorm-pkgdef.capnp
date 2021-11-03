@@ -7,8 +7,8 @@ const pkgdef :Spk.PackageDefinition = (
 
   manifest = (
     appTitle = (defaultText = "Baby Buddy"),
-    appVersion = 2,  # Increment this for every release.
-    appMarketingVersion = (defaultText = "1.4.0"),
+    appVersion = 3,  # Increment this for every release.
+    appMarketingVersion = (defaultText = "1.5.0"),
     actions = [
       ( nounPhrase = (defaultText = "instance"),
         command = .firstRunCommand
@@ -27,7 +27,7 @@ const pkgdef :Spk.PackageDefinition = (
       license = (openSource = bsd2Clause),
       categories = [productivity, other],
       author = (
-        contactEmail = "wells@chrxs.net",
+        contactEmail = "babybuddy-sandstorm@chris-wells.net",
         pgpSignature = embed "pgp-signature",
       ),
       pgpKeyring = embed "pgp-keyring",
@@ -52,7 +52,7 @@ const pkgdef :Spk.PackageDefinition = (
   ),
   fileList = "sandstorm-files.list",
   alwaysInclude = [ "opt/app/babybuddy", "usr/lib/python3",
-                    "usr/lib/python3.7", "usr/share/zoneinfo",
+                    "usr/lib/python3.9", "usr/share/zoneinfo",
                     "usr/share/locale" ],
   bridgeConfig = (
     viewInfo = (

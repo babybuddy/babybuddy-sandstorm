@@ -1,8 +1,8 @@
 diff --git a/Pipfile b/Pipfile
-index 62a51bb..26cd24f 100644
+index 14851a9..b3454b7 100644
 --- a/Pipfile
 +++ b/Pipfile
-@@ -13,12 +13,12 @@ faker = "*"
+@@ -12,7 +12,6 @@ faker = "*"
  dj-database-url = "*"
  gunicorn = "*"
  whitenoise = "*"
@@ -10,8 +10,10 @@ index 62a51bb..26cd24f 100644
  easy-thumbnails = "*"
  python-dotenv = "*"
  django-storages = "*"
- boto3 = "*"
+@@ -20,6 +19,7 @@ boto3 = "*"
  django-import-export = "*"
+ pyyaml = "*"
+ uritemplate = "*"
 +django-sandstorm = {editable = true,git = "https://github.com/cdubz/django-sandstorm.git"}
  
  [dev-packages]
