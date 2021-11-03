@@ -76,8 +76,12 @@ increment the "appVersion" directive by one.
 1. Test new/modified functionality in the [Sandstorm dev environment](http://local.sandstorm.io:6080).
 
         browse http://local.sandstorm.io:6080
+
+1. When ready, stop the development app (Ctrl-C) and clean the files list.
+
+        ./clean-sandstorm-files.sh
         
-1. When ready, stop the development app (Ctrl-C) and pack the new SPK.
+1. Pack the new SPK! :tada:
 
         vagrant-spk pack ~/babybuddy.spk
         
