@@ -1,8 +1,14 @@
 diff --git a/Pipfile b/Pipfile
-index 62a51bb..4a20390 100644
+index 62a51bb..26cd24f 100644
 --- a/Pipfile
 +++ b/Pipfile
-@@ -19,6 +19,7 @@ python-dotenv = "*"
+@@ -13,12 +13,12 @@ faker = "*"
+ dj-database-url = "*"
+ gunicorn = "*"
+ whitenoise = "*"
+-psycopg2-binary = "*"
+ easy-thumbnails = "*"
+ python-dotenv = "*"
  django-storages = "*"
  boto3 = "*"
  django-import-export = "*"
