@@ -5,7 +5,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Install system dependencies.
 apt-get update
 apt-get install
-apt-get install -y nginx uwsgi uwsgi-plugin-python3 python3-venv sqlite3 git
+apt-get install -y nginx uwsgi uwsgi-plugin-python3 python3-pip python3-venv sqlite3 git
 
 # Install pipx and pipenv.
 python3 -m pip install --user pipx
