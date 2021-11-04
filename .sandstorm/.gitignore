@@ -1,2 +1,5 @@
 # Vagrant machines storage.
 .vagrant
+
+# Vagrant log files.
+*.log
