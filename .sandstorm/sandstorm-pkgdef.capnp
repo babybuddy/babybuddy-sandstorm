@@ -7,8 +7,8 @@ const pkgdef :Spk.PackageDefinition = (
 
   manifest = (
     appTitle = (defaultText = "Baby Buddy"),
-    appVersion = 3,  # Increment this for every release.
-    appMarketingVersion = (defaultText = "1.5.0"),
+    appVersion = 4,  # Increment this for every release.
+    appMarketingVersion = (defaultText = "1.9.1"),
     actions = [
       ( nounPhrase = (defaultText = "instance"),
         command = .firstRunCommand

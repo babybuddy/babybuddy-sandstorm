@@ -1,25 +1,22 @@
 diff --git a/Pipfile b/Pipfile
-index 14851a9..b3454b7 100644
+index beb707b..85330aa 100644
 --- a/Pipfile
 +++ b/Pipfile
-@@ -12,7 +12,6 @@ faker = "*"
- dj-database-url = "*"
+@@ -16,11 +16,11 @@ easy-thumbnails = "*"
+ faker = "*"
  gunicorn = "*"
- whitenoise = "*"
+ plotly = "*"
 -psycopg2-binary = "*"
- easy-thumbnails = "*"
  python-dotenv = "*"
- django-storages = "*"
-@@ -20,6 +19,7 @@ boto3 = "*"
- django-import-export = "*"
  pyyaml = "*"
  uritemplate = "*"
+ whitenoise = "*"
 +django-sandstorm = {editable = true,git = "https://github.com/cdubz/django-sandstorm.git"}
  
  [dev-packages]
  coveralls = "*"
 diff --git a/babybuddy/forms.py b/babybuddy/forms.py
-index 4f0a7fb..c386b61 100644
+index c48ce90..8a09a98 100644
 --- a/babybuddy/forms.py
 +++ b/babybuddy/forms.py
 @@ -6,20 +6,6 @@ from django.contrib.auth.models import User
@@ -115,29 +112,27 @@ index 0000000..7aa8682
 +
 +MEDIA_ROOT = '/var/media'
 diff --git a/babybuddy/templates/babybuddy/nav-dropdown.html b/babybuddy/templates/babybuddy/nav-dropdown.html
-index 14f02aa..034fd30 100644
+index 84fa085..a56ba24 100644
 --- a/babybuddy/templates/babybuddy/nav-dropdown.html
 +++ b/babybuddy/templates/babybuddy/nav-dropdown.html
-@@ -239,14 +239,11 @@
-                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-user-menu-link">
-                             <h6 class="dropdown-header">{% trans "User" %}</h6>
-                             <a href="{% url 'babybuddy:user-settings' %}" class="dropdown-item">{% trans "Settings" %}</a>
--                            <a href="{% url 'babybuddy:user-password' %}" class="dropdown-item">{% trans "Password" %}</a>
--                            <a href="{% url 'babybuddy:logout' %}" class="dropdown-item">{% trans "Logout" %}</a>
-                             <h6 class="dropdown-header">{% trans "Site" %}</h6>
-                             <a href="{% url 'api:api-root' %}"
-                                class="dropdown-item"
-                                target="_blank">{% trans "API Browser" %}</a>
-                             {% if request.user.is_staff %}
--                                <a href="{% url 'babybuddy:user-list' %}" class="dropdown-item">{% trans "Users" %}</a>
-                                 <a href="{% url 'admin:index' %}" class="dropdown-item">{% trans "Database Admin" %}</a>
-                             {% endif %}
-                             <h6 class="dropdown-header">{% trans "Support" %}</h6>
+@@ -268,12 +268,9 @@
+                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="nav-user-menu-link">
+                                 <h6 class="dropdown-header">{% trans "User" %}</h6>
+                                 <a href="{% url 'babybuddy:user-settings' %}" class="dropdown-item">{% trans "Settings" %}</a>
+-                                <a href="{% url 'babybuddy:user-password' %}" class="dropdown-item">{% trans "Password" %}</a>
+-                                <a href="{% url 'babybuddy:logout' %}" class="dropdown-item">{% trans "Logout" %}</a>
+                                 <h6 class="dropdown-header">{% trans "Site" %}</h6>
+                                 <a href="{% url 'api:api-root' %}" class="dropdown-item">{% trans "API Browser" %}</a>
+                                 {% if request.user.is_staff %}
+-                                    <a href="{% url 'babybuddy:user-list' %}" class="dropdown-item">{% trans "Users" %}</a>
+                                     <a href="{% url 'admin:index' %}" class="dropdown-item">{% trans "Database Admin" %}</a>
+                                 {% endif %}
+                                 <h6 class="dropdown-header">{% trans "Support" %}</h6>
 diff --git a/babybuddy/urls.py b/babybuddy/urls.py
-index a18f2a1..8fad3ae 100644
+index d1f2507..34d9348 100644
 --- a/babybuddy/urls.py
 +++ b/babybuddy/urls.py
-@@ -9,34 +9,17 @@ from . import views
+@@ -9,34 +9,16 @@ from . import views
  
  app_patterns = [
      path('login/', auth_views.LoginView.as_view(), name='login'),
@@ -163,24 +158,24 @@ index a18f2a1..8fad3ae 100644
 -        views.UserDelete.as_view(),
 -        name='user-delete'
 -    ),
- 
+-
 -    path(
 -        'user/password/',
 -        views.UserPassword.as_view(),
 -        name='user-password'
 -    ),
      path(
-         'user/reset-api-key/',
-         views.UserResetAPIKey.as_view(),
+         'user/settings/',
+         views.UserSettings.as_view(),
 diff --git a/babybuddy/views.py b/babybuddy/views.py
-index 75f36b9..31eaab9 100644
+index 8f3bb44..f942afb 100644
 --- a/babybuddy/views.py
 +++ b/babybuddy/views.py
-@@ -47,16 +47,6 @@ class UserList(StaffOnlyMixin, BabyBuddyFilterView):
+@@ -55,16 +55,6 @@ class UserList(StaffOnlyMixin, BabyBuddyFilterView):
      filterset_fields = ('username', 'first_name', 'last_name', 'email')
  
  
--class UserAdd(StaffOnlyMixin, PermissionRequired403Mixin, SuccessMessageMixin,
+-class UserAdd(StaffOnlyMixin, PermissionRequiredMixin, SuccessMessageMixin,
 -              CreateView):
 -    model = User
 -    template_name = 'babybuddy/user_form.html'
@@ -190,14 +185,14 @@ index 75f36b9..31eaab9 100644
 -    success_message = gettext_lazy('User %(username)s added!')
 -
 -
- class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
+ class UserUpdate(StaffOnlyMixin, PermissionRequiredMixin,
                   SuccessMessageMixin, UpdateView):
      model = User
-@@ -67,42 +57,6 @@ class UserUpdate(StaffOnlyMixin, PermissionRequired403Mixin,
+@@ -75,42 +65,6 @@ class UserUpdate(StaffOnlyMixin, PermissionRequiredMixin,
      success_message = gettext_lazy('User %(username)s updated.')
  
  
--class UserDelete(StaffOnlyMixin, PermissionRequired403Mixin,
+-class UserDelete(StaffOnlyMixin, PermissionRequiredMixin,
 -                 DeleteView):
 -    model = User
 -    template_name = 'babybuddy/user_confirm_delete.html'
@@ -233,6 +228,6 @@ index 75f36b9..31eaab9 100644
 -        return render(request, self.template_name, {'form': form})
 -
 -
- class UserResetAPIKey(LoginRequiredMixin, View):
+ class UserSettings(LoginRequiredMixin, View):
      """
-     Resets the API key of the logged in user.
+     Handles both the User and Settings models.
