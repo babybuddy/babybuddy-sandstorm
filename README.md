@@ -49,42 +49,58 @@ application migrations, and starts uwsgi and nginx.
 Follow the steps below to update the version of Baby Buddy shipped with the
 Sandstorm app:
 
-1. Clone this repository.
+1. Clone this repository. 
 
-        git clone git@github.com:babybuddy/babybuddy-sandstorm.git
-    
+   ```shell   
+   git clone git@github.com:babybuddy/babybuddy-sandstorm.git
+   ```
+
 1. Move in to the repository.
 
-        cd babybuddy-sandstorm
+   ```shell
+   cd babybuddy-sandstorm
+   ```
     
 1. Open the [`sandstorm-pkgdef.capnp`](.sandstorm/sandstorm-pkgdef.capnp) file
 and set the "appMarketingVersion" directive to a new version of Baby Buddy and
 increment the "appVersion" directive by one.
 
-        editor .sandstorm/sandstorm-pkgdef.capnp
-        
+   ```shell
+   editor .sandstorm/sandstorm-pkgdef.capnp
+   ```
+
 1. Start the VM via Vagrant SPK.
 
-        vagrant-spk vm up
+   ```shell
+   vagrant-spk vm up
+   ```
     
 1. Run the Vagrant SPK dev instance.
 
-        vagrant-spk dev
+   ```shell
+   vagrant-spk dev
+   ```
         
-    *Note: Confirm that [`sandstorm.patch`](sandstorm.patch) still applies
-    during this command execution and update the patch if necessary.*
+   *Note: Confirm that [`sandstorm.patch`](sandstorm.patch) still applies
+   during this command execution and update the patch if necessary.*
     
 1. Test new/modified functionality in the [Sandstorm dev environment](http://local.sandstorm.io:6080).
 
-        browse http://local.sandstorm.io:6080
+   ```shell
+   browse http://local.sandstorm.io:6080
+   ```
 
 1. When ready, stop the development app (Ctrl-C) and clean the files list.
 
-        ./clean-sandstorm-files.sh
+   ```shell
+   ./clean-sandstorm-files.sh
+   ```
         
 1. Pack the new SPK! :tada:
 
-        vagrant-spk pack ~/babybuddy.spk
+   ```shell
+   vagrant-spk pack ~/babybuddy.spk
+   ```
         
 ### Updating [`sandstorm.patch`](sandstorm.patch)
 
@@ -98,26 +114,36 @@ new patch will need to created:
 
 1. Move in to the `babybuddy` folder.
 
-        cd babybuddy
+   ```shell
+   cd babybuddy
+   ```
 
 1. Apply the patch using 3way merge so conflicts will be created.
 
-        git apply --3way ../sandstorm.patch
+   ```shell
+   git apply --3way ../sandstorm.patch
+   ```
 
 1. Resolve any conflicts and make additional changes as needed.
         
 1. Add all files to git.
 
-        git add --all
+   ```shell
+   git add --all
+   ```
         
 1. Create a diff of the changes and save it to [`sandstorm.patch`](sandstorm.patch).
 
-        git diff HEAD > ../sandstorm.patch
+   ```shell
+   git diff HEAD > ../sandstorm.patch
+   ```
         
 1. Return to the main repository folder and start the vagrant dev instance.
 
-        cd ..
-        vagrant-spk dev
+   ```shell
+   cd ..
+   vagrant-spk dev
+   ```
         
 If the patch update was successful, the new patch should apply cleanly during
 the build phase.
