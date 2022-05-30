@@ -5,6 +5,7 @@ app for [Sandstorm](https://sandstorm.io/).
 
 ## App Version History
 
+- v5: [Baby Buddy 1.11.0](https://github.com/babybuddy/babybuddy/releases/tag/v1.11.0)
 - v4: [Baby Buddy 1.9.1](https://github.com/babybuddy/babybuddy/releases/tag/v1.9.1)
 - v3: [Baby Buddy 1.5.0](https://github.com/babybuddy/babybuddy/releases/tag/v1.5.0)
 - v2: [Baby Buddy 1.4.0](https://github.com/babybuddy/babybuddy/releases/tag/v1.4.0)
